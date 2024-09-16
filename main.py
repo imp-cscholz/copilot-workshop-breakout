@@ -1,9 +1,11 @@
 import pygame
 import sys
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, BLACK, WHITE
+import random
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, BLACK, WHITE, LIVES
 from paddle import Paddle
 from ball import Ball
 from brick import create_bricks
+from powerup import Powerup
 
 def draw_text(screen, text, size, color, x, y):
     font = pygame.font.Font(None, size)
@@ -21,8 +23,10 @@ def main():
     paddle = Paddle()
     ball = Ball()
     bricks = create_bricks()
+    powerups = []
+    lives = LIVES
     running = True
-    game_state = "start"  # Possible states: start, playing, win, lose
+    game_state = "start"
 
     while running:
         for event in pygame.event.get():
@@ -37,6 +41,7 @@ def main():
                     game_state = "start"
                     ball = Ball()
                     bricks = create_bricks()
+                    lives = LIVES
 
         if game_state == "playing":
             keys = pygame.key.get_pressed()
@@ -57,11 +62,31 @@ def main():
             for brick in bricks[:]:
                 if ball.rect.colliderect(brick.rect):
                     ball.speed_y = -ball.speed_y
-                    bricks.remove(brick)
+                    brick.hits -= 1
+                    if brick.hits <= 0:
+                        bricks.remove(brick)
+                        # Randomly generate a powerup
+                        if random.random() < 0.1:
+                            powerup = Powerup(brick.rect.x, brick.rect.y)
+                            powerups.append(powerup)
+
+            # Move and check collision with powerups
+            for powerup in powerups[:]:
+                powerup.move()
+                if powerup.rect.colliderect(paddle.rect):
+                    powerups.remove(powerup)
+                    # Apply powerup effect (e.g., increase ball size)
+                    ball.rect.inflate_ip(10, 10)
+                elif powerup.rect.top > SCREEN_HEIGHT:
+                    powerups.remove(powerup)
 
             # Check if the ball has fallen below the paddle
             if ball.rect.top > SCREEN_HEIGHT:
-                game_state = "lose"
+                lives -= 1
+                if lives <= 0:
+                    game_state = "lose"
+                else:
+                    ball = Ball()
 
             # Check if all bricks have been destroyed
             if not bricks:
@@ -80,6 +105,9 @@ def main():
             ball.draw(screen)
             for brick in bricks:
                 brick.draw(screen)
+            for powerup in powerups:
+                powerup.draw(screen)
+            draw_text(screen, f"Lives: {lives}", 30, WHITE, 70, 20)
 
         pygame.display.flip()
         clock.tick(60)

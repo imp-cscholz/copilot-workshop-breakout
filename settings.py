@@ -6,6 +6,9 @@ SCREEN_HEIGHT = 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
 
 # Paddle properties
 PADDLE_WIDTH = 100
@@ -22,3 +25,10 @@ BRICK_WIDTH = 75
 BRICK_HEIGHT = 20
 BRICK_ROWS = 3
 BRICK_COLUMNS = 6
+
+# Powerup properties
+POWERUP_SIZE = 20
+POWERUP_SPEED = 3
+
+# Game properties
+LIVES = 3
