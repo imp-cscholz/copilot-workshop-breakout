@@ -34,7 +34,11 @@ def main():
 
         # Collision with paddle
         if ball.rect.colliderect(paddle.rect):
+            # Calculate the offset from the center of the paddle
+            offset = (ball.rect.centerx - paddle.rect.centerx) / (paddle.rect.width / 2)
+            # Adjust the ball's speed based on the offset
             ball.speed_y = -ball.speed_y
+            ball.speed_x = ball.speed_x + offset * 5  # Adjust the multiplier as needed
 
         # Collision with bricks
         for brick in bricks[:]:
